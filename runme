@@ -1,0 +1,276 @@
+#!/bin/bash
+
+# Xorg Plasma
+xorg_plasma=(
+    xorg
+    plasma
+)
+
+# Plasma software to install
+plasma_stage=(
+    htop
+    #sddm
+    dolphin
+    kitty
+    firefox
+    bat
+    #man-db
+    man-pages
+    tldr
+    alacritty
+    #kde-cli-tools
+    kompare
+    krename
+    krusader
+)
+
+# Software to install
+software_stage=(
+    bash-completion
+    #bat
+    exa
+    faad2
+    feh
+    fish
+    flameshot
+    #guvcview
+    kalk
+    libmad
+    #libzip
+    lshw
+    pacman-contrib
+    pavucontrol
+    ripgrep
+    rsync
+    thunderbird
+    time
+    tree
+    wavpack
+    wget
+    # Archive tools
+    #gzip
+    p7zip
+    unace
+    unrar
+    unzip
+    # Fonts
+    awesome-terminal-fonts
+    #noto-fonts
+    ttf-font-awesome
+    ttf-jetbrains-mono
+    ttf-jetbrains-mono-nerd
+    ttf-mononoki-nerd
+)
+
+# Themes to install
+themes_stage=(
+    vimix-cursors
+)
+
+# Set some colors
+CNT="[\e[1;36mNOTE\e[0m]"
+COK="[\e[1;32mOK\e[0m]"
+CER="[\e[1;31mERROR\e[0m]"
+CAT="[\e[1;37mATTENTION\e[0m]"
+CWR="[\e[1;35mWARNING\e[0m]"
+CAC="[\e[1;33mACTION\e[0m]"
+INSTLOG="install.log"
+
+installed_dir=$(dirname $(readlink -f $(basename `pwd`)))
+
+# clear the screen
+clear
+
+# set some expectations for the user
+echo -e "$CNT - You are about to execute a script that would attempt to setup KDE Plasma."
+sleep 1
+
+# attempt to discover if this is a VM or not
+echo -e "$CNT - Checking for Physical or VM..."
+ISVM=$(hostnamectl | grep Chassis)
+echo -e "Using $ISVM"
+
+# update
+echo -e "$CNT - Updating the system, please enter the sudo password..."
+sudo pacman -Syu &>> $INSTLOG
+
+# give the user an option to exit out
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to continue with the install (y,n) ' CONTINST
+if [[ $CONTINST == "Y" || $CONTINST == "y" ]]; then
+    echo -e "$CNT - Setup starting..."
+else
+    echo -e "$CNT - This script would now exit, no changes were made to your system."
+    exit
+fi
+
+# Ask if the user has an NVIDIA GPU
+read -rep $'[\e[1;33mACTION\e[0m] - Do you want to install Nvidia driver? (y,n) ' ISNVIDIA
+if [[ $ISNVIDIA == "Y" || $ISNVIDIA == "y" ]]; then
+    ISNVIDIA=true
+else
+    ISNVIDIA=false
+fi
+
+### Disable wifi powersave mode ###
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to disable WiFi powersave? (y,n) ' WIFI
+if [[ $WIFI == "Y" || $WIFI == "y" ]]; then
+    LOC="/etc/NetworkManager/conf.d/wifi-powersave.conf"
+    echo -e "$CNT - The following file has been created $LOC."
+    echo -e "[connection]\nwifi.powersave = 2" | sudo tee -a $LOC &>> $INSTLOG
+    echo -e "$CNT - Restarting NetworkManager service..."
+    sleep 1
+    sudo systemctl restart NetworkManager &>> $INSTLOG
+    sleep 2
+fi
+
+### Disable Intel snd-hda powersave mode ###
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to disable Intel snd-hda powersave? (y,n) ' SNDHDA
+if [[ $SNDHDA == "Y" || $SNDHDA == "y" ]]; then
+    LOC="/etc/modprobe.d/sound.conf"
+    echo -e "$CNT - The following file has been created $LOC."
+    echo -e "options snd-hda-intel power_save=0" | sudo tee -a $LOC &>> $INSTLOG
+    sleep 1
+fi
+
+#### Check for package manager ####
+ISYAY=/sbin/yay
+if [ -f "$ISYAY" ]; then
+    echo -e "$COK - yay was located, moving on."
+else
+    echo -e "$CWR - Yay was NOT located.. yay is (still) required"
+    read -rep $'[\e[1;33mACTION\e[0m] - Would you like to install yay (y,n) ' INSTYAY
+    if [[ $INSTYAY == "Y" || $INSTYAY == "y" ]]; then
+        git clone https://aur.archlinux.org/yay-git.git &>> $INSTLOG
+        cd yay-git
+        makepkg -si --noconfirm &>> ../$INSTLOG
+        cd ..
+    else
+        echo -e "$CER - Yay is (still) required for this script, now exiting"
+        exit
+    fi
+    # update the yay database
+    echo -e "$CNT - Updating the yay database..."
+    yay -Suy --noconfirm &>> $INSTLOG
+fi
+
+# function that will test for a package and if not found it will attempt to install it
+install_plasma() {
+    # no package found so installing
+    echo -e "$CNT - Now installing $1 ..."
+    sudo pacman -S --noconfirm --needed $1 &>> $INSTLOG
+    echo -e "\e[1A\e[K$COK - $1 was installed."
+}
+
+# function that will test for a package and if not found it will attempt to install it
+install_software() {
+    # First lets see if the package is there
+    if yay -Q $1 &>> /dev/null ; then
+        echo -e "$COK - $1 is already installed."
+    else
+        # no package found so installing
+        echo -e "$CNT - Now installing $1 ..."
+        yay -S --noconfirm $1 &>> $INSTLOG
+        # test to make sure package installed
+        if yay -Q $1 &>> /dev/null ; then
+            echo -e "\e[1A\e[K$COK - $1 was installed."
+        else
+            # if this is hit then a package is missing, exit to review log
+            echo -e "\e[1A\e[K$CER - $1 install had failed, please check the install.log"
+            exit
+        fi
+    fi
+}
+
+### Install all of the above pacakges ####
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to install the packages? (y,n) ' INST
+if [[ $INST == "Y" || $INST == "y" ]]; then
+    # Setup Nvidia if it was selected
+    if [[ "$ISNVIDIA" == true ]]; then
+        echo -e "$CNT - Nvidia setup stage, this may take a while..."
+        for SOFTWR in nvidia nvidia-utils nvidia-settings
+        do
+            install_software $SOFTWR
+        done
+    fi
+
+    # Pacman boost
+    echo -e "$CNT - Boosting pacman..."
+    FIND="#ParallelDownloads = 5"
+    REPLACE="ParallelDownloads = 10"
+    sudo sed -i "s/$FIND/$REPLACE/g" /etc/pacman.conf
+    sleep 1
+    FINDCOLOR='#Color'
+    REPLACECOLOR='Color\nILoveCandy'
+    sudo sed -i "s/$FINDCOLOR/$REPLACECOLOR/g" /etc/pacman.conf
+    sleep 1
+    # Exa colors
+    echo 'EXA_COLORS="di=1;33:da=37:ur=30;42:uw=30;42:ux=30;42:gr=30;43:gw=30;43:gx=30;43:tr=30;41:tw=30;41:tx=30;41:sn=37:sb=37:uu=32;1"' | sudo tee -a /etc/environment &>> $INSTLOG
+    sudo pacman -Sy &>> $INSTLOG
+    # Rate mirrors
+    install_software rate-mirrors-bin
+    echo -e "$CNT - Rating mirrors..."
+    sudo rate-mirrors --allow-root --save /etc/pacman.d/mirrorlist arch &>> $INSTLOG
+
+    # Stage 0 - xorg plasma
+    echo -e "$CNT - Installing plasma..."
+    for SOFTWR in ${xorg_plasma[@]}; do
+        install_plasma $SOFTWR
+    done
+
+    # Stage 1 - plasma components
+    echo -e "$CNT - Installing plasma components..."
+    for SOFTWR in ${plasma_stage[@]}; do
+        install_software $SOFTWR
+    done
+
+    # Enable the sddm login manager service
+    echo -e "$CNT - Enabling the SDDM Service..."
+    sudo systemctl enable sddm &>> $INSTLOG
+    sleep 2
+
+    # Stage 2 - software
+    echo -e "$CNT - Installing software components..."
+    for SOFTWR in ${software_stage[@]}; do
+        install_software $SOFTWR
+    done
+
+    # Stage 3 - themes
+    echo -e "$CNT - Installing theme components..."
+    for SOFTWR in ${themes_stage[@]}; do
+        install_software $SOFTWR
+    done
+
+    # Sublime Text
+    echo -e "$CNT - Installing Sublime Text GPG key  ..."
+    curl -O https://download.sublimetext.com/sublimehq-pub.gpg && sudo pacman-key --add sublimehq-pub.gpg && sudo pacman-key --lsign-key 8A8F901A && rm sublimehq-pub.gpg $>> $INSTLOG
+    sleep 1
+    echo -e "\e[1A\e[K$COK - GPG key was installed."
+
+    echo -e "$CNT - Adding the Stable x86_64 channel to pacman.conf ..."
+    echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" | sudo tee -a /etc/pacman.conf $>> $INSTLOG
+    sleep 1
+    echo -e "\e[1A\e[K$COK - Stable x86_64 channel was added."
+
+    echo -e "$CNT - Synchronizing package databases ..."
+    sudo pacman -Syy &>> $INSTLOG
+    sleep 1
+    echo -e "\e[1A\e[K$COK - Databases are up to date."
+
+    echo -e "$CNT - Installing Sublime Text ..."
+    sudo pacman -S --noconfirm --needed sublime-text &>> $INSTLOG
+    sleep 1
+    echo -e "\e[1A\e[K$COK - Sublime Text was installed."
+
+
+
+
+fi
+
+### Copy Config Files ###
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to copy config files? (y,n) ' CFG
+if [[ $CFG == "Y" || $CFG == "y" ]]; then
+    #sudo cp -f $installed_dir/adds/files/background.jpg /usr/share/sddm/themes/simplicity/images/background.jpg
+    cp -rf $installed_dir/settings/* $HOME/.config/
+    sudo cp $installed_dir/adds/files/sysctl.conf /etc/sysctl.conf
+    cp -rf $installed_dir/home/oh* /home/
+fi
