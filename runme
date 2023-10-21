@@ -92,7 +92,7 @@ echo -e "Using $ISVM"
 
 # update
 echo -e "$CNT - Updating the system, please enter the sudo password..."
-sudo pacman -Syu &>> $INSTLOG
+sudo pacman -Syu --noconfirm --needed &>> $INSTLOG
 
 # give the user an option to exit out
 read -rep $'[\e[1;33mACTION\e[0m] - Would you like to continue with the install (y,n) ' CONTINST
@@ -252,7 +252,7 @@ if [[ $INST == "Y" || $INST == "y" ]]; then
     echo -e "\e[1A\e[K$COK - Stable x86_64 channel was added."
 
     echo -e "$CNT - Synchronizing package databases ..."
-    sudo pacman -Syy &>> $INSTLOG
+    sudo pacman -Sy &>> $INSTLOG
     sleep 1
     echo -e "\e[1A\e[K$COK - Databases are up to date."
 
