@@ -212,13 +212,13 @@ if [[ $INST == "Y" || $INST == "y" ]]; then
     sudo rate-mirrors --allow-root --save /etc/pacman.d/mirrorlist arch &>> $INSTLOG
 
     # Stage 0 - xorg plasma
-    echo -e "$CNT - Installing plasma..."
+    echo -e "$CNT - PLASMA..."
     for SOFTWR in ${xorg_plasma[@]}; do
         install_plasma $SOFTWR
     done
 
     # Stage 1 - plasma components
-    echo -e "$CNT - Installing plasma components..."
+    echo -e "$CNT - PLASMA COMPONENTS..."
     for SOFTWR in ${plasma_stage[@]}; do
         install_software $SOFTWR
     done
@@ -229,18 +229,19 @@ if [[ $INST == "Y" || $INST == "y" ]]; then
     sleep 2
 
     # Stage 2 - software
-    echo -e "$CNT - Installing software components..."
+    echo -e "$CNT - SOFTWARE..."
     for SOFTWR in ${software_stage[@]}; do
         install_software $SOFTWR
     done
 
     # Stage 3 - themes
-    echo -e "$CNT - Installing theme components..."
+    echo -e "$CNT - THEME..."
     for SOFTWR in ${themes_stage[@]}; do
         install_software $SOFTWR
     done
 
-    # Sublime Text
+    # Stage 4 Sublime Text
+    echo -e "$CNT - SUBLIME TEXT..."
     echo -e "$CNT - Installing Sublime Text GPG key  ..."
     curl -O https://download.sublimetext.com/sublimehq-pub.gpg &>> $INSTLOG && sudo pacman-key --add sublimehq-pub.gpg &>> $INSTLOG && sudo pacman-key --lsign-key 8A8F901A &>> $INSTLOG && rm sublimehq-pub.gpg &>> $INSTLOG
     sleep 1
