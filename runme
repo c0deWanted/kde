@@ -264,6 +264,15 @@ if [[ $INST == "Y" || $INST == "y" ]]; then
 
 fi
 
+### Enable bluetooth service ###
+read -rep $'[\e[1;33mACTION\e[0m] - Would you like to enable Bluetooth? (y,n) ' BT
+if [[ $BT == "Y" || $BT == "y" ]]; then
+    echo -e "$CNT - Enabling bluetooth ..."
+    sudo systemctl enable --now bluetooth.service &>> $INSTLOG
+    echo -e "$COK"
+    sleep 2
+fi
+
 ### Copy Config Files ###
 read -rep $'[\e[1;33mACTION\e[0m] - Would you like to copy config files? (y,n) ' CFG
 if [[ $CFG == "Y" || $CFG == "y" ]]; then
