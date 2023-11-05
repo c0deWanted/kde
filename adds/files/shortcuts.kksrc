@@ -3,7 +3,7 @@ switch-to-activity-bc760227-5b38-471d-9702-38f8155d1f60=
 
 [Alacritty.desktop][Global Shortcuts]
 New=
-_launch=
+_launch=Ctrl+Alt+T
 
 [KDE Keyboard Layout Switcher][Global Shortcuts]
 Switch keyboard layout to German=
@@ -13,11 +13,11 @@ Switch to Next Keyboard Layout=Meta+Alt+K
 [StandardShortcuts]
 AboutApp=
 AboutKDE=
-Activate Next Tab=Ctrl+PgDown; Ctrl+]
-Activate Previous Tab=Ctrl+PgUp; Ctrl+[
+Activate Next Tab=Ctrl+]; Ctrl+PgDown
+Activate Previous Tab=Ctrl+[; Ctrl+PgUp
 ActualSize=Ctrl+0
 AddBookmark=Ctrl+B
-Back=Alt+Left; Back
+Back=Back; Alt+Left
 BackwardWord=Ctrl+Left
 Begin=Ctrl+Home
 BeginningOfLine=Home
@@ -27,7 +27,7 @@ ConfigureNotifications=
 ConfigureToolbars=
 Copy=Ctrl+C; Ctrl+Ins
 CreateFolder=F10
-Cut=Ctrl+X; Shift+Del
+Cut=Shift+Del; Ctrl+X
 DeleteFile=Shift+Del
 DeleteWordBack=Ctrl+Backspace
 DeleteWordForward=Ctrl+Del
@@ -44,7 +44,7 @@ FindPrev=Shift+F3
 FitToHeight=
 FitToPage=
 FitToWidth=
-Forward=Alt+Right; Forward
+Forward=Forward; Alt+Right
 ForwardWord=Ctrl+Right
 FullScreen=Ctrl+Shift+F
 Goto=
@@ -112,7 +112,7 @@ Toggle Touchpad=Touchpad Toggle
 
 [kded5][Global Shortcuts]
 Show System Activity=Ctrl+Esc
-display=Display; Meta+P
+display=Meta+P; Display
 
 [khotkeys][Global Shortcuts]
 {d03619b6-9b3c-48cc-9d9c-a2aadb485550}=
@@ -125,12 +125,12 @@ decrease_microphone_volume=Microphone Volume Down
 decrease_volume=Volume Down
 increase_microphone_volume=Microphone Volume Up
 increase_volume=Volume Up
-mic_mute=Meta+Volume Mute; Microphone Mute
+mic_mute=Microphone Mute; Meta+Volume Mute
 mute=Volume Mute
 
 [ksmserver][Global Shortcuts]
 Halt Without Confirmation=
-Lock Session=Meta+L; Screensaver
+Lock Session=Screensaver; Meta+L
 Log Out=Ctrl+Alt+Del
 Log Out Without Confirmation=
 Reboot Without Confirmation=
@@ -221,7 +221,7 @@ Walk Through Windows of Current Application Alternative (Reverse)=
 Window Above Other Windows=
 Window Below Other Windows=
 Window Close=Meta+Q
-Window Fullscreen=Meta+F
+Window Fullscreen=
 Window Grow Horizontal=
 Window Grow Vertical=
 Window Lower=
@@ -292,7 +292,7 @@ Window to Screen 5=
 Window to Screen 6=
 Window to Screen 7=
 view_actual_size=
-view_zoom_in=Meta+=; Meta++
+view_zoom_in=Meta++; Meta+=
 view_zoom_out=Meta+-
 
 [mediacontrol][Global Shortcuts]
@@ -315,7 +315,7 @@ _launch=
 
 [org.kde.krunner.desktop][Global Shortcuts]
 RunClipboard=Alt+Shift+F2
-_launch=Search; Alt+Space; Alt+F2
+_launch=Alt+F2; Search; Alt+Space
 
 [org.kde.krusader.desktop][Global Shortcuts]
 _launch=Meta+E
@@ -334,6 +334,12 @@ PowerOff=Power Off
 Sleep=Sleep
 Toggle Keyboard Backlight=Keyboard Light On/Off
 Turn Off Screen=
+
+[pavucontrol.desktop][Global Shortcuts]
+_launch=Meta+C
+
+[pcmanfm-qt.desktop][Global Shortcuts]
+_launch=Meta+Shift+E
 
 [plasmashell][Global Shortcuts]
 activate task manager entry 1=
@@ -368,12 +374,15 @@ toggle do not disturb=
 [reboot.desktop][Global Shortcuts]
 _launch=Meta+Shift+I
 
+[rofi-2.desktop][Global Shortcuts]
+_launch=Meta+R
+
 [shutdown.desktop][Global Shortcuts]
 _launch=Meta+Shift+P
 
 [sublime_text.desktop][Global Shortcuts]
-_launch=
-new-file=Meta+S
+_launch=Meta+S
+new-file=
 new-window=
 
 [systemsettings.desktop][Global Shortcuts]
